@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html manifest=mathpad.manifest>
+<meta charset=utf-8>
+<meta name=apple-mobile-web-app-capable content=yes>
+<meta name=apple-mobile-web-app-status-bar-style content=black>
+<meta name=format-detection content="telephone=no">
+<meta name=viewport content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, minimal-ui">
+<title>Magic Mathpad</title>
+<link href="https://fonts.googleapis.com/css?family=Shadows+Into+Light" rel=stylesheet>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    padding: 1em calc(1em + 10px) 1em 1em;
+    font-size: 20px;
+    line-height: 30px;
+    background: #666;
+    font-family: sans-serif;
+  }
+  body {
+    margin: 0;
+    height: 0;
+    display: flex;
+    flex-flow: row wrap;
+  }
+  body:after {
+    content: '';
+    display: block;
+    height: 2em;
+    flex: 1 100%;
+  }
+  header,
+  main {
+    flex: 1 100%;
+    box-shadow: #cdcdcd 1px 2px,
+                #d2d2d2 2px 4px,
+                #d7d7d7 3px 6px,
+                #dcdcdc 4px 8px,
+                #e1e1e1 5px 10px,
+                #e6e6e6 6px 12px,
+                #ebebeb 7px 14px,
+                #f0f0f0 8px 16px,
+                #f5f5f5 9px 18px,
+                #fafafa 10px 20px,
+                rgba(0,0,0,.3) 10px 20px 15px;
+  }
+  header {
+    background: navy;
+    margin: 0;
+    padding: 1em;
+    border-bottom: 1px solid rgba(0,0,0,1);
+  }
+  h1 {
+    margin: 0;
+    color: rgb(200,200,255);
+    font-family: 'Fira Sans', sans-serif;
+    font-style: italic;
+    text-shadow: white 0 1px 0,
+                 rgba(0,0,0,.8) 0 -1px 0;
+  }
+  main {
+    display: flex;
+    max-width: 100%;
+    background-size: 100% 30px;
+    background-position: 0 0;
+    background-image: linear-gradient(
+      to bottom,
+      white,
+      white 29px,
+      lightskyblue
+    );
+  }
+  textarea {
+    flex: 1;
+    margin: 0 auto;
+    min-height: 6em;
+    outline: none;
+    font-size: 30px;
+    line-height: 30px;
+    padding: 1em;
+    border: none;
+    border-top: 1px dashed rgba(0,0,0,.15);
+    font-family: 'Shadows Into Light', cursive;
+    color: #444;
+    letter-spacing: .02em;  
+    background-size: 100% 100%;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0),
+      rgba(0,0,0,.1)
+    );
+    overflow: hidden;
+  }
+  #magic {
+    color: darkblue;
+    background-color: rgba(0,200,250,.1)
+  }
+  @media (min-width: 600px) {
+    html {
+      padding: 2em calc(2em + 10px) 2em 2em;
+    }
+  }
+</style>
+<header><h1>Magic Mathpad</h1></header>
+<main>
+<textarea id=math autocomplete=off autocorrect=off autocapitalize=off data-persist=math>
+"This is a string"
+text = "a variable"
+
+// Comments ignored
+
+"Reusing variables"
+num = 5
+
+Math.sqrt(num)
+num
+num + num
+num * num
+  
+"Happy Calculations!"
+</textarea>
+<textarea id=magic></textarea>
+<script>
+  var magicMathPad = (function(){
+    var math = document.querySelector('#math'),
+        magic = document.querySelector('#magic')
+    function magic2math(){
+      var text = math.value.split('\n'),
+          output = ''
+      text.map(function(a){
+        var line = ''
+        eval(a) && (line += eval(a))
+        output += line + '\n'
+      })
+      magic.value = ''
+      magic.value = output
+    }
+    function autoExpand(el){
+      el.style.height = 'inherit'
+      el.style.height = el.scrollHeight+'px'
+    }
+    window.addEventListener('load',function(){autoExpand(math)})
+    window.addEventListener('resize',function(){autoExpand(math)})
+    math.addEventListener('paste',function(e){autoExpand(e.target)})
+    math.addEventListener('input',function(e){autoExpand(e.target)})
+    math.addEventListener('keyup',function(e){autoExpand(e.target)})
+    window.addEventListener('load',magic2math)
+    math.addEventListener('paste',magic2math)
+    math.addEventListener('input',magic2math)
+    math.addEventListener('keyup',magic2math)
+  })()
+</script>
+<script>
+  var field = document.querySelectorAll('[data-persist]')
+  for (i=0;i<field.length;i++){
+    var stored = localStorage.getItem(field[i].getAttribute('data-persist'))
+    if (stored) field[i].value = stored
+    field[i].addEventListener('input',function(){
+      localStorage.setItem(this.getAttribute('data-persist'),this.value)
+    })
+  }
+</script>
